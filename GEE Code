@@ -1,0 +1,29 @@
+//Se importaron 2 elementos que no son visibles en el código de abajo, un imageCollection (Landsat8) y un Table (nicoya). 
+//Código copiado y pegado de Google Earth Engine
+
+
+//Cargar Landsat al mapa
+var image = ee.Image((Landsat8)
+//Limitar la carga de las imágenes al polígono que tenemos, pasándolo como parámetro
+.filterBounds(nicoya)
+//Filtrar la fecha de las imágenes de Landsat8
+.filterDate("2019-03-01", "2019-12-31")
+//Ordenar las imágenes en base a la propiedad de la imagen landsat de "CLOUD_COVER"
+.sort("CLOUD_COVER")
+//Seleccionar las bandas ópticas del diccionario "B", del 1 al 7.
+.select(["B[1-7]"])
+//Toma el primer valor de la colección y lo muestra, o sea el que posee menor nubosidad para los filtros anteriores.
+.first());
+//Variable que alberga la image recortada para solo observar la imagen en la cuenca seleccionada
+var clipped = image.clip(nicoya);
+//Se agregan las variables creadas como capas para visualizarlas en el mapa.
+Map.addLayer(nicoya,{color: "7b95e8"},"P. Nicoya");
+Map.addLayer(clipped,{},"L8 Image");
+
+//Combinaciones de banda
+
+Map.addLayer(clipped,{min:0,max:0.3, bands:["B5", "B4", "B3"]},"Infrarrojo");
+Map.addLayer(clipped,{min:0,max:0.3, bands:["B7", "B6", "B4"]},"Falso color para urbano");
+Map.addLayer(clipped,{min:0,max:0.3, bands:["B4", "B3", "B2"]},"Color natural");
+Map.addLayer(clipped,{min:0,max:0.4, bands:["B6", "B5", "B2"]},"Zonas agrícolas");
+Map.addLayer(clipped,{min:0,max:0.3, bands:["B5", "B6", "B2"]},"L8 Image");
